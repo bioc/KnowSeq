@@ -126,7 +126,7 @@ dataPlot <- function(data, labels, colours = c("green", "red"), main = "", ylab 
       xx <- melt(meltMatrix[,seq_len(col)])
       names(xx) <- c("Classes", "Gen", "Value")
 
-      print(ggplot(xx, aes(x=as.factor(Classes),y=Value,fill=as.factor(Classes))) + geom_boxplot() + facet_wrap(~Gen, ncol = 3))
+      print(ggplot(xx, aes(x=as.factor(Classes),y=Value,fill=as.factor(Classes))) + geom_boxplot() + facet_wrap(~Gen, ncol = 3)+ scale_fill_manual(breaks = levels(as.factor(Classes)), values=colours)))
 
       if(toPNG){
         cat("Creating PNG...\n")
