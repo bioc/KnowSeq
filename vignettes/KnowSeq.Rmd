@@ -290,22 +290,20 @@ Before the DEGs extraction process, it is important to detect and removes any po
 RNAseqQA(expressionMatrix)
 ```
 
-The other important step in this section is the batch effect treatment. It is widely known that this is a crucial step in the omics data processing due to the intrinsic deviations that the data can present due to its origin, sequencing design, etc… Besides, when working with public data it is very difficult to know if exists a real batch effect among the selected datasets. This package provides a way of detecting possible clusters implying possible batch effect groups and correcting them [@gohBatch]. If there are batch effects in the data, it will present clusters formed because of the batch effect influence. For that, first, the function *dataPlot* with the parameter mode equal to *"optimalClusters"* has to be run with the purpose of detecting the optimal number of clusters existing in the samples. Furthermore, this clusters can be represented graphically by calling the function dataPlot again but this time with the parameter method equal to *"knnClustering"*. Once the optimal number of clusters is calculated, the second and final step to remove the batch effect is by calling the function *batchEffectRemoval*, that makes use of sva package [@sva], with the parameter mode equal to *"combat"* and the parameter clusters equal to the optimal number of clusters calculated before. This step allows obtaining an expression matrix with the batch effect treated by combat method. An example to do this is below:
+The other important step in this section is the batch effect treatment. It is widely known that this is a crucial step in the omics data processing due to the intrinsic deviations that the data can present due to its origin, sequencing design, etc… Besides, when working with public data it is very difficult to know if exists a real batch effect among the selected datasets. This package allows removing batch effect if the batch groups are known by calling the function *batchEffectRemoval*, that makes use of sva package [@sva], with the parameter mode equal to *"combat"* [@gohBatch]. This step allows obtaining an expression matrix with the batch effect treated by combat method. An example to do this is below:
 
 
 ```{r Removing_batch_effect_combat} 
-# Calculating the optimal number of clusters presented in the samples in order to 
-# try to identificate the batch effect groups to remove it by combat method
+# Removing batch effect by using combat and known batch groups 
 
-dataPlot(expressionMatrix,labels,mode = "optimalClusters",toPNG = TRUE,toPDF = TRUE)
+batchGroups <- c(1,1,1,1,2,2,1,2,1,2)
 
-dataPlot(t(expressionMatrix),labels,mode = "knnClustering", clusters = 9,toPNG = TRUE,toPDF = TRUE)
+expressionMatrixCorrected <- batchEffectRemoval(expressionMatrix, labels, 
+batchGroups = batchGroups, method = "combat")
 
-expressionMatrixCorrected <- batchEffectRemoval(expressionMatrix, labels, clusters = 9,
-method = "combat")
 ```
 
-There is another method in the function that removes the batch effect and it is by using surrogate variable analysis or sva. To use this method, it is not necessary to calculates the optimal number of clusters, the only requirement to use it is to set the parameter method equal to *"sva"*. This method does not return a matrix with the batch effect corrected, instead of this, the function returns a model that has to be used as single input parameter of the function *limmaDEGsExtraction*.
+There is another method in the function that removes the batch effect and it is by using surrogate variable analysis or sva, the only requirement to use it is to set the parameter method equal to *"sva"*. This methodt does not return a matrix with the batch effect corrected, instead of this, the function returns a model that has to be used as single input parameter of the function *limmaDEGsExtraction*.
 
 ```{r Removing_batch_effect_sva}
 # Calculating the surrogate variable analysis to remove batch effect
