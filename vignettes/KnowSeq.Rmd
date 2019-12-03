@@ -169,7 +169,7 @@ From now on, the data that will be used for the documentation are real count fil
 
 ```{r Preparing_data}
 suppressMessages(library(KnowSeq))
-
+ 
 # Downloading one series from NCBI/GEO and one series from ArrayExpress
 
 downloadPublicSeries(c("GSE74251","GSE81593"))
