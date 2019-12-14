@@ -2,18 +2,16 @@
 subtitle: "KnowSeq: R/Bioconductor package"
 title: "From RAW to Knowledge: The KnowSeq user guide"
 author: "Daniel Castillo-Secilla, Juan Manuel Galvez, Francisco Manuel Ortuno, Luis Javier Herrera and Ignacio Rojas"
-date: "december, 13 of 2019"
+date: "december, 14 of 2019"
 output:
-  pdf_document: 
+  html_document: 
     toc: true
     toc_depth: 3
     number_sections: true
-    highlight: tango
 header-includes:
   - \pdfminorversion=5
   - \pdfcompresslevel=9
   - \pdfobjcompresslevel=2
-link-citations: yes
 BiocStyle::html_vignette:
   md_extensions: -autolink_bare_uris
 vignette: >
