@@ -18,7 +18,6 @@ importFrom(tximport, tximport)
 importFrom(caret, trainControl, train, knn3, confusionMatrix)
 importFrom(class, knn)
 importFrom(limma, eBayes, topTable, lmFit, makeContrasts, contrasts.fit, decideTests)
-importFrom(arrayQualityMetrics, arrayQualityMetrics)
 importFrom(e1071, svm)
 importFrom(pathview, pathview)
 importFrom(topGO, getPvalues, runTest, GenTable, genesInTerm, annFUN.org, groupGOTerms)
@@ -26,5 +25,5 @@ importFrom(httr, GET, content)
 
 export(batchEffectRemoval, calculateGeneExpressionValues, countsToMatrix, dataPlot, DEGsPathwayVisualization, DEGsToDiseases,
               downloadPublicSeries, featureSelection, fileMove, gdcClientDownload, geneOntologyEnrichment, getAnnotationFromEnsembl,
-              hisatAlignment, kallistoAlignment, knn_CV, knn_test, limmaDEGsExtraction, plotConfMatrix, rawAlignment, rf_CV, rf_test,
-              RNAseqQA, salmonAlignment, sraToFastq, svm_CV, svm_test, tophatAlignment)
+              hisatAlignment, kallistoAlignment, knn_CV, knn_test, limmaDEGsExtraction, plotConfMatrix, rawAlignment, rf_CV, rf_test
+              , salmonAlignment, sraToFastq, svm_CV, svm_test, tophatAlignment)

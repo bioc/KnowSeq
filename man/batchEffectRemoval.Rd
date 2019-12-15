@@ -4,8 +4,12 @@
 \alias{batchEffectRemoval}
 \title{Corrects the batch effect of the data by using the selected method.}
 \usage{
-batchEffectRemoval(expressionMatrix, labels, method = "combat",
-  batchGroups = c())
+batchEffectRemoval(
+  expressionMatrix,
+  labels,
+  method = "combat",
+  batchGroups = c()
+)
 }
 \arguments{
 \item{expressionMatrix}{The original expression matrix to treat the batch effect.}

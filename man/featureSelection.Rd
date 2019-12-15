@@ -4,8 +4,7 @@
 \alias{featureSelection}
 \title{featureSelection function calculates the optimal order of DEGs to achieve the best result in the posterior machine learning process by using mRMR algorithm or Random Forest.}
 \usage{
-featureSelection(data, labels, vars_selected, mode = "mrmr",
-  disease = "")
+featureSelection(data, labels, vars_selected, mode = "mrmr", disease = "")
 }
 \arguments{
 \item{data}{The data parameter is an expression matrix or data.frame that contains the genes in the columns and the samples in the rows.}
