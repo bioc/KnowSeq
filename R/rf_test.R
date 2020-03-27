@@ -6,7 +6,7 @@
 #' @param labelsTrain A vector or factor that contains the training labels for each of the samples in the train object.
 #' @param test The test parameter is an expression matrix or data.frame that contains the test dataset with the genes in the columns and the samples in the rows.
 #' @param labelsTest A vector or factor that contains the test labels for each of the samples in the test object.
-#' @param vars_selected The genes selected to classify by using them. It can be the final DEGs extracted with the function \code{\link{limmaDEGsExtraction}} or a custom vector of genes. Furthermore, the ranking achieved by \code{\link{featureSelection}} function can be used as input of this parameter.
+#' @param vars_selected The genes selected to classify by using them. It can be the final DEGs extracted with the function \code{\link{DEGsExtraction}} or a custom vector of genes. Furthermore, the ranking achieved by \code{\link{featureSelection}} function can be used as input of this parameter.
 #' @return A list that contains four objects. The confusion matrix, the accuracy, the sensitibity and the specificity for each genes.
 #' @examples
 #' dir <- system.file("extdata", package="KnowSeq")
@@ -17,7 +17,7 @@
 #' testMatrix <- t(DEGsMatrix)[c(5,10),]
 #' testLabels <- labels[c(5,10)]
 #'
-#' rf_test(trainingMatrix,trainingLabels,testMatrix,testLabels,rownames(DEGsMatrix)[1:10])
+#' rf_test(trainingMatrix, trainingLabels, testMatrix, testLabels,rownames(DEGsMatrix)[1:10])
 
 rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected){
 
@@ -74,7 +74,22 @@ rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected){
   sensVector <- double()
   specVector <- double()
   cfMatList  <- list()
-
+  
+  # Firstly with 1 variable
+  cat(paste("Testing with ", 1," variables...\n",sep=""))
+  rf_mod = randomForest(x = train[, 1, drop=FALSE], y = labelsTrain, ntree = 100)
+  predicts <- predict(rf_mod , test[, 1, drop=FALSE])
+  
+  cfMat<-confusionMatrix(predicts,labelsTest)
+  acc<-confusionMatrix(predicts,labelsTest)$overall[[1]]
+  sens<-confusionMatrix(predicts,labelsTest)$byClass[[1]]
+  spec<-confusionMatrix(predicts,labelsTest)$byClass[[2]]
+  
+  cfMatList[[1]] <- cfMat
+  accVector[1] <- acc
+  sensVector[1] <- sens
+  specVector[1] <- spec
+  
   for(i in c(2:dim(train)[2])){
 
     cat(paste("Testing with ", i," variables...\n",sep=""))

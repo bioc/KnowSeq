@@ -6,26 +6,25 @@
 \usage{
 getAnnotationFromEnsembl(
   values,
-  attributes = c("ensembl_gene_id", "external_gene_name", "percentage_gene_gc_content",
-    "gene_biotype"),
-  filters = "ensembl_gene_id",
-  referenceGenome = 38,
+  attributes = c("ensembl_gene_id", "external_gene_name", "percentage_gene_gc_content"),
+  filter = "ensembl_gene_id",
   notHSapiens = FALSE,
-  notHumandataset = ""
+  notHumandataset = "",
+  referenceGenome = 38
 )
 }
 \arguments{
-\item{values}{A list of genes that contains the names or IDs.}
+\item{values}{A list of genes that contains the names or IDs or "allGenome" string, which indicates that all genome will be  returned.}
 
 \item{attributes}{A vector which contains the different information attributes that the Ensembl biomart admit.}
 
-\item{filters}{The attributes used as filter to return the rest of the attributes.}
-
-\item{referenceGenome}{The human reference genome used to return the annotation. The possibilities are two: 37 and 38}
+\item{filter}{The attribute used as filter to return the rest of the attributes.}
 
 \item{notHSapiens}{A boolean value that indicates if the user wants the human annotation or another annotation available in BiomaRt. The possible not human dataset can be consulted by calling the following function: biomaRt::listDatasets(useMart("ensembl")).}
 
 \item{notHumandataset}{A dataset identification from biomaRt::listDatasets(useMart("ensembl")).}
+
+\item{referenceGenome}{Integer that indicates used reference genome. It must be 37 or 38.}
 }
 \value{
 A matrix that contains all the information asked to the attributes parameter.
@@ -34,5 +33,6 @@ A matrix that contains all the information asked to the attributes parameter.
 The function returns the required information about a list of genes from Ensembl biomart. This list of genes can be Ensembl ID, gene names or either of the possible values admited by Ensembl biomart. Furthermore, the reference genome can be chosen depending on the necessity of the user.
 }
 \examples{
-myAnnotation <- getAnnotationFromEnsembl(c("ENSG00000210049","ENSG00000211459","ENSG00000210077"),referenceGenome=37)
+myAnnotation <- getAnnotationFromEnsembl(c("KRT19","BRCA1"),attributes=c("ensembl_gene_id","percentage_gene_gc_content","entrezgene_id"),filter='external_gene_name',notHSapiens=FALSE)
+myAnnotation <- getAnnotationFromEnsembl(c("MGP_129S1SvImJ_G0038602", "MGP_129S1SvImJ_G0007718"),attributes=c("percentage_gene_gc_content","ensembl_gene_id"),filter='ensembl_gene_id',notHSapiens = TRUE, notHumandataset = 'mm129s1svimj_gene_ensembl')
 }
