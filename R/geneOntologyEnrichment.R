@@ -5,13 +5,13 @@
 #' @param ontologies A list that contains ontologies to be searchs. Values must be contained in the following three: BP, CC, MF.
 #' @param pvalCutOff The maximum p-value to considers that a genes is related with a GO term.
 #' @param geneType A string indicating the type of genes in geneList, it must be one of indicated in DAVIDs API documentation.
-#' @param returnGeneSymbols A boolean that indicates if gene symbols must be added to the ontolgies matrix.
+#' @param returnGeneSymbols A boolean that indicates if gene symbols must be added to the ontologies matrix.
 #' @return A list that contains a matrix for each of the possible ontologies and a matrix with the GOs for the three ontologies together.
 #' @examples
 #' dir <- system.file("extdata", package="KnowSeq")
 #' load(paste(dir,"/expressionExample.RData",sep = ""))
 #' data <- getAnnotationFromEnsembl(rownames(DEGsMatrix),attributes=c("ensembl_gene_id","external_gene_name","entrezgene_id"),filter='external_gene_name')
-#' GOsList <- geneOntologyEnrichment(as.character(data$ensembl_gene_id),geneType='ENSEMBL_GENE_ID',pvalCutOff=0.1,returnGeneSymbols = TRUE)
+#' GOsList <- geneOntologyEnrichment(as.character(data$entrezgene_id),geneType='ENTREZ_GENE_ID',pvalCutOff=0.1,returnGeneSymbols = TRUE)
 
 geneOntologyEnrichment <- function(geneList, geneType="ENTREZ_GENE_ID", ontologies=c('BP','CC','MF'), pvalCutOff=1,returnGeneSymbols=FALSE){
   if(!is(geneList)[1]=='character'){stop('The class of geneList must be character')}
@@ -36,7 +36,7 @@ geneOntologyEnrichment <- function(geneList, geneType="ENTREZ_GENE_ID", ontologi
     genes.annotations <- getAnnotationFromEnsembl(geneList,attributes=c("external_gene_name",gene.type),filter=gene.type)
   }
 
-  cat('Retrieving Geno Ontologie terms related to the list of DEGs...')
+  cat('Retrieving Gene Ontology terms related to the list of DEGs...')
   geneList <- paste(geneList, collapse=",")
   base  <- 'https://david.ncifcrf.gov/'
   
@@ -71,10 +71,20 @@ geneOntologyEnrichment <- function(geneList, geneType="ENTREZ_GENE_ID", ontologi
   for (go.type in c('GOTERM_MF_ALL','GOTERM_CC_ALL','GOTERM_BP_ALL')){
     act.gos <- gos.data[gos.data$Category == go.type,colnames(gos.data)!='Category']
     if(dim(act.gos)[1]>0){
-      tmp <- vapply(as.character(act.gos$Term),strsplit,'~',FUN.VALUE = list(1))
-      tmp <- t(matrix(unlist(tmp),nrow=2))
-      act.gos[['GO.ID']] <- tmp[,1]
-      act.gos[['Term']] <- tmp[,2]
+      ontology.term <- c()
+      remove <- c()
+      for ( i in seq(length(act.gos$Term))){
+        ontology.str <- as.character(act.gos[i,'Term'])
+        num.gos <- str_count(ontology.str,'GO:')
+        if (num.gos == 1) ontology.term <- c(ontology.term,strsplit(ontology.str,'~'))
+        else remove <- c(remove,i)
+      }
+      ontology.term <- t(matrix(unlist(ontology.term),nrow=2))
+      
+      if (length(remove)>0) act.gos <- act.gos[-remove,]
+      act.gos[['GO.ID']] <- ontology.term[,1]
+      act.gos[['Term']] <- ontology.term[,2]
+
       
       # Add column with gene symbols
       if (returnGeneSymbols){

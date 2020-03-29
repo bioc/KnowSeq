@@ -7,8 +7,10 @@
 knowseqReport(
   data,
   labels,
+  MLTest = FALSE,
+  testData = "",
+  testLabels = "",
   outdir = "knowSeq-report",
-  baseline = "expression",
   qualityAnalysis = TRUE,
   batchEffectTreatment = TRUE,
   geneOntology = TRUE,
@@ -26,13 +28,17 @@ knowseqReport(
 )
 }
 \arguments{
-\item{data}{A matrix that contains the gene expression or counts values.}
+\item{data}{A matrix that contains the gene expression.}
 
 \item{labels}{A vector or factor that contains the labels for each of the samples in the data object.}
 
-\item{outdir}{The output directory to store the report.}
+\item{MLTest}{This parameter enables the classification process for a test dataset.}
 
-\item{baseline}{A string that indicates the start point. This will be 'expression' if data contains genes expression values or 'counts' if data contains genes counts values.}
+\item{testData}{A matrix that contains the unseen samples for the test process.}
+
+\item{testLabels}{A vector or factor that contains the labels for the unseen samples for the test process.}
+
+\item{outdir}{The output directory to store the report.}
 
 \item{qualityAnalysis}{A logical parameter that indicates if the user wants to perform the quality anaylisis or not.}
 
