@@ -148,7 +148,7 @@ As with the NCBI/GEO csv, the csv of ArrayExpress requires only three columns as
 There is another way to achieve this csv automatically by calling the function downloadPublicSeries with the ArrayExpress MTAB ID of the wanted series, but this option does not let the user to choose the wanted samples, and therefore and downloads all the samples of each selected series.
 
 ### GDC Portal CSV format
-GDC portal has the BAM files access restricted or controlled for the user who has access to them. However, the count files are open and can be used directly in this package as input of the function atrix. If there exist the possibility to download the controlled BAM files, the tsv file that this package uses to convert them into count files is the tsv file generated when the button Sample Sheet is clicked in the cart:
+GDC portal has the BAM files access restricted or controlled for the user who has access to them. However, the count files are open and can be used directly in this package as input of the function countsToMatrix. If there exist the possibility to download the controlled BAM files, the tsv file that this package uses to convert them into count files is the tsv file generated when the button Sample Sheet is clicked in the cart:
 
 ![](gdc.png)
 
@@ -216,7 +216,7 @@ After the raw alignment step, a list of count files of the samples is available 
 
 ### Merging all count files 
 
-After the alignment, as many count files as samples in the CSV used for the alignment have been created. In order to prepare the data for the DEGs analysis, it is important to merge all these files in one matrix that contains the genes Ensembl ID (or other IDs) in the rows and the name of the samples in the columns. To carry this out, the function *atrix* is available. This function reads all count files and joints them in one matrix by using edgeR package [15]. To call the function it is only necessary a CSV with the information about the count files paths. The required CSV has to have the following format:
+After the alignment, as many count files as samples in the CSV used for the alignment have been created. In order to prepare the data for the DEGs analysis, it is important to merge all these files in one matrix that contains the genes Ensembl ID (or other IDs) in the rows and the name of the samples in the columns. To carry this out, the function *countsToMatrix* is available. This function reads all count files and joints them in one matrix by using edgeR package [15]. To call the function it is only necessary a CSV with the information about the count files paths. The required CSV has to have the following format:
 
 |     Run    |             Path             |  Class  |
 |:----------:|:----------------------------:|:-------:|
@@ -230,7 +230,7 @@ The column Run is the name of the sample without .count, the column Path is the 
 ```{r Merging_files} 
 # Merging in one matrix all the count files indicated inside the CSV file
 
-countsInformation <- countsToMatrix("mergedCountsInfo.csv", extension = 'count')
+countsInformation <- countsToMatrix("mergedCountsInfo.csv")
 
 # Exporting to independent variables the counts matrix and the labels
 

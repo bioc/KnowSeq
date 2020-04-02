@@ -9,8 +9,7 @@
 #' @param referenceGenome Integer that indicates used reference genome. It must be 37 or 38.
 #' @return A matrix that contains all the information asked to the attributes parameter.
 #' @examples
-#' myAnnotation <- getGenesAnnotation(c("KRT19","BRCA1"),attributes=c("ensembl_gene_id","percentage_gene_gc_content","entrezgene_id"),filter='external_gene_name',notHSapiens=FALSE)
-#' myAnnotation <- getGenesAnnotation(c("MGP_129S1SvImJ_G0038602", "MGP_129S1SvImJ_G0007718"),attributes=c("percentage_gene_gc_content","ensembl_gene_id"),filter='ensembl_gene_id',notHSapiens = TRUE, notHumandataset = 'mm129s1svimj_gene_ensembl')
+#' myAnnotation <- getGenesAnnotation(c("KRT19","BRCA1"), filter="external_gene_name",notHSapiens=FALSE)
 
 getGenesAnnotation <- function(values,attributes=c("ensembl_gene_id","external_gene_name","percentage_gene_gc_content"), filter="ensembl_gene_id", notHSapiens = FALSE, notHumandataset = "",referenceGenome=38){
   
@@ -88,14 +87,36 @@ getGenesAnnotation <- function(values,attributes=c("ensembl_gene_id","external_g
     query <- paste(query,'</Dataset></Query>',sep='')
     
     # Download annotation file
-    response <- GET(URLencode(paste(base,'?query=',query,sep='')))
-    act.myAnnotation <- read.csv(text=content(response,'text'),sep=',',header=FALSE)
-
-    
+    act.myAnnotation <- tryCatch(
+      {
+        response <- GET(URLencode(paste(base,'?query=',query,sep='')))
+        act.myAnnotation <- read.csv(text=content(response,as='text',encoding='UTF-8'),sep=',',header=FALSE)
+        colnames(act.myAnnotation) <- union(attributes,filter)
+        act.myAnnotation
+      },
+      error = function(e){
+        tryCatch(
+          {
+            response <- GET(URLencode(paste(base,'?query=',query,sep='')))
+            act.myAnnotation <- read.csv(text=content(response,as='text',encoding='UTF-8'),sep=',',header=FALSE)
+            colnames(act.myAnnotation) <- union(attributes,filter)
+            return(act.myAnnotation)
+          },
+          error = function(e){''},
+          finally={
+            message('\nConnection error, please try again.')
+            result <- data.frame(matrix(ncol = length(attributes), nrow = 0))
+            colnames(result)  <- attributes
+            return(result)
+          }
+        )
+      },
+      error = function(e){''}
+    )
     if( grepl('ERROR',act.myAnnotation[1,1]) ){
-      
+
       stop('Error in query, please check attributes and filter')
-      
+
     }
     
     if (dim(myAnnotation)[1] == 0) myAnnotation <- act.myAnnotation
@@ -106,7 +127,6 @@ getGenesAnnotation <- function(values,attributes=c("ensembl_gene_id","external_g
     max.values <- min(max,length(act.values))
   }
   
-  colnames(myAnnotation) <- union(attributes,filter)
   if (length(values)>1 || values != 'allGenome')
     myAnnotation <- myAnnotation[myAnnotation[[filter]] %in% values,]
 
