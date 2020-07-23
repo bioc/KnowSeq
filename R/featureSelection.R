@@ -1,14 +1,12 @@
-#' featureSelection function calculates the optimal order of DEGs to achieve the best result in the posterior machine learning process by using mRMR algorithm or Random Forest.
-#'
 #' featureSelection function calculates the optimal order of DEGs to achieve the best result in the posterior machine learning process by using mRMR algorithm or Random Forest. Furthermore, the ranking is returned and can be used as input of the parameter vars_selected in the machine learning functions.
 #'
 #' @param data The data parameter is an expression matrix or data.frame that contains the genes in the columns and the samples in the rows.
 #' @param labels A vector or factor that contains the labels for each samples in data parameter.
 #' @param vars_selected The genes selected to use in the feature selection process. It can be the final DEGs extracted with the function \code{\link{DEGsExtraction}} or a custom vector of genes.
-#' @param mode The algorithm used to calculate the genes ranking. The possibilities are two: mrmr, rf and da.
+#' @param mode The algorithm used to calculate the genes ranking. The possibilities are three: mrmr, rf and da.
 #' @param disease The name of a disease in order to calculate the Disease Association ranking by using the DEGs indicated in the vars_selected parameter.
 #' @param subdiseases Vector with the name of the particular subdiseases from disease in order to calculate the Disease Association ranking by using the DEGs indicated in the vars_selected parameter.
-#' @param maxGenes Integer that indicated the maximun number of genes to be returned. 
+#' @param maxGenes Integer that indicated the maximum number of genes to be returned. 
 #' @return A vector that contains the ranking of genes.
 #' @examples
 #' dir <- system.file("extdata", package="KnowSeq")
@@ -56,7 +54,7 @@ featureSelection <-function(data,labels,vars_selected,mode="mrmr",disease="",sub
     cat("Calculating the ranking of the most relevant genes by using Random Forest algorithm...\n")
     
     rfRanking <- randomForest(data[,vars_selected], labels, importance=TRUE,proximity=TRUE)
-    rfRanking <- rfRanking$importance[order(rfRanking$importance[,3],decreasing = TRUE),]
+    rfRanking <- rfRanking$importance[order(rfRanking$importance[, "MeanDecreaseAccuracy"], decreasing = TRUE),]
     
     cat("Random Forest ranking: ")
     cat(rownames(rfRanking))
@@ -279,7 +277,7 @@ featureSelection <-function(data,labels,vars_selected,mode="mrmr",disease="",sub
     }
     return(selected.genes)
   }else{
-    stop("The mode is unrecognized, please use mrmr or rf.")
+    stop("The mode is unrecognized, please use mrmr, rf, da or daRed.")
   }
 }
 

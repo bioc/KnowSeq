@@ -7,6 +7,7 @@
 #' @param test The test parameter is an expression matrix or data.frame that contains the test dataset with the genes in the columns and the samples in the rows.
 #' @param labelsTest A vector or factor that contains the test labels for each of the samples in the test object.
 #' @param vars_selected The genes selected to classify by using them. It can be the final DEGs extracted with the function \code{\link{DEGsExtraction}} or a custom vector of genes. Furthermore, the ranking achieved by \code{\link{featureSelection}} function can be used as input of this parameter.
+#' @param bestParameters Best values for ntree and mtry parameters selected during the training phase.
 #' @return A list that contains four objects. The confusion matrix, the accuracy, the sensitibity and the specificity for each genes.
 #' @examples
 #' dir <- system.file("extdata", package="KnowSeq")
@@ -19,7 +20,7 @@
 #'
 #' rf_test(trainingMatrix, trainingLabels, testMatrix, testLabels,rownames(DEGsMatrix)[1:10])
 
-rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected){
+rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected,bestParameters){
 
   if(!is.data.frame(train) && !is.matrix(train)){
 
@@ -50,7 +51,6 @@ rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected){
     stop("The length of the rows of the argument test must be the same than the length of the lablesTest. Please, ensures that the rows are the samples and the columns are the variables.")
 
   }
-
   train <- as.data.frame(apply(train,2,as.double))
   train <- train[,vars_selected]
   test <- as.data.frame(apply(test,2,as.double))
@@ -73,22 +73,30 @@ rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected){
   accVector <- double()
   sensVector <- double()
   specVector <- double()
+  f1Vector <- double()
   cfMatList  <- list()
   
   # Firstly with 1 variable
   cat(paste("Testing with ", 1," variables...\n",sep=""))
-  rf_mod = randomForest(x = train[, 1, drop=FALSE], y = labelsTrain, ntree = 100)
+  rf_mod = randomForest(x = train[, 1, drop=FALSE], y = labelsTrain)
   predicts <- predict(rf_mod , test[, 1, drop=FALSE])
   
   cfMat<-confusionMatrix(predicts,labelsTest)
-  acc<-confusionMatrix(predicts,labelsTest)$overall[[1]]
-  sens<-confusionMatrix(predicts,labelsTest)$byClass[[1]]
-  spec<-confusionMatrix(predicts,labelsTest)$byClass[[2]]
+  if (length(levels(labelsTrain))==2){
+    sens <- cfMat$byClass[[1]]
+    spec <- cfMat$byClass[[2]]
+    f1 <- cfMat$byClass[[7]]
+  } else{
+    sens <- mean(cfMat$byClass[,1])
+    spec <- mean(cfMat$byClass[,2])
+    f1 <- mean(cfMat$byClass[,7])
+  }
   
   cfMatList[[1]] <- cfMat
-  accVector[1] <- acc
+  accVector[1] <- cfMat$overall[[1]]
   sensVector[1] <- sens
   specVector[1] <- spec
+  f1Vector[1] <- f1
   
   for(i in c(2:dim(train)[2])){
 
@@ -97,14 +105,21 @@ rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected){
     predicts <- predict(rf_mod , test[,seq(i)])
 
     cfMat<-confusionMatrix(predicts,labelsTest)
-    acc<-confusionMatrix(predicts,labelsTest)$overall[[1]]
-    sens<-confusionMatrix(predicts,labelsTest)$byClass[[1]]
-    spec<-confusionMatrix(predicts,labelsTest)$byClass[[2]]
-
+    if (length(levels(labelsTrain))==2){
+      sens <- cfMat$byClass[[1]]
+      spec <- cfMat$byClass[[2]]
+      f1 <- cfMat$byClass[[7]]
+    } else{
+      sens <- mean(cfMat$byClass[,1])
+      spec <- mean(cfMat$byClass[,2])
+      f1 <- mean(cfMat$byClass[,7])
+    }
+    
     cfMatList[[i]] <- cfMat
-    accVector[i] <- acc
+    accVector[i] <- cfMat$overall[[1]]
     sensVector[i] <- sens
     specVector[i] <- spec
+    f1Vector[i] <- f1
 
   }
 
@@ -112,9 +127,10 @@ rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected){
   names(accVector) <- vars_selected
   names(sensVector) <- vars_selected
   names(specVector) <- vars_selected
-
-  results <- list(cfMatList,accVector,sensVector,specVector)
-  names(results) <- c("cfMats","accVector","sensVector","specVector")
+  names(f1Vector) <- vars_selected
+  
+  results <- list(cfMatList,accVector,sensVector,specVector,f1Vector)
+  names(results) <- c("cfMats","accVector","sensVector","specVector","f1Vector")
   invisible(results)
 
 }
