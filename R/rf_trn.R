@@ -1,6 +1,6 @@
-#' rf_CV allows assessing the final DEGs through a machine learning step by using Random Forest in a cross validation process.
+#' rf_trn allows assessing the final DEGs through a machine learning step by using Random Forest in a cross validation process.
 #'
-#' rf_CV allows assessing the final DEGs through a machine learning step by using Random Forest in a cross validation process. This function applies a cross validation of n folds with representation of all classes in each fold. The 80\% of the data are used for training and the 20\% for test.
+#' rf_trn allows assessing the final DEGs through a machine learning step by using Random Forest in a cross validation process. This function applies a cross validation of n folds with representation of all classes in each fold. The 80\% of the data are used for training and the 20\% for test.
 #'
 #' @param data The data parameter is an expression matrix or data.frame that contains the genes in the columns and the samples in the rows.
 #' @param labels A vector or factor that contains the labels for each of the samples in the data object.
@@ -11,7 +11,7 @@
 #' dir <- system.file("extdata", package="KnowSeq")
 #' load(paste(dir,"/expressionExample.RData",sep = ""))
 #'
-#' rf_trn(t(DEGsMatrix),labels,rownames(DEGsMatrix),2)
+#' rf_trn(t(DEGsMatrix),labels,rownames(DEGsMatrix),5)
 
 rf_trn <- function(data,labels,vars_selected,numFold=10){
 
@@ -53,10 +53,10 @@ rf_trn <- function(data,labels,vars_selected,numFold=10){
   
   for(tree in seq(100,1000, by=100)){
   
-    tuning <- tuneRF(data, labels, ntreeTry = tree, doBest = T)
+    tuning <- tuneRF(data, labels, ntreeTry = tree, doBest = T, stepFactor = 1)
     bestParamsMatrix[i,1] <- tuning$mtry
     bestParamsMatrix[i,2] <- tree
-    bestParamsMatrix[i,3] <- mean(tuning$confusion[,4])
+    bestParamsMatrix[i,3] <- mean(tuning$confusion[, "class.error"])
   
     i = i + 1
     
