@@ -59,16 +59,26 @@ svm_test <-function(train,labelsTrain,test,labelsTest,vars_selected,bestParamete
   test <- test[,vars_selected]
   
   train = vapply(train, function(x){ 
-    max = max(x)
-    min = min(x)
-    x = ((x-min)/(max-min))*2-1}, double(nrow(train)))
+    max <- max(x)
+    min <- min(x)
+    if(max >  min){
+      x <- ((x - min) / (max - min)) * 2 - 1
+    }
+    else{
+      x
+    }}, double(nrow(train)))
   
   train <- as.data.frame(train)
   
   test = vapply(test, function(x){ 
-    max = max(x)
-    min = min(x)
-    x = ((x-min)/(max-min))*2-1}, double(nrow(test)))
+    max <- max(x)
+    min <- min(x)
+    if(max >  min){
+      x <- ((x - min) / (max - min)) * 2 - 1
+    }
+    else{
+      x
+    }}, double(nrow(test)))
   
   test <- as.data.frame(test)
 
@@ -84,15 +94,18 @@ svm_test <-function(train,labelsTrain,test,labelsTest,vars_selected,bestParamete
     columns <- c(colNames[seq(i)])
     tr_ctr <- trainControl(method="none")
     dataForTrt <- data.frame(cbind(subset(train, select=columns),labelsTrain))
-    colnames(train)[seq(i)] <- columns
+    colnames(train)[seq(j)] <- make.names(columns)
     svm_model <- train(labelsTrain ~ ., data = dataForTrt, type = "C-svc", 
                        method = "svmRadial", preProc = c("center", "scale"),
                        trControl = tr_ctr, 
                        tuneGrid=data.frame(sigma=getElement(bestParameters, "gamma"), 
                                            C = getElement(bestParameters, "C")))
-    unkX <- subset(test, select=columns)
-    predicts <- extractPrediction(list(my_svm=svm_model), testX = subset(test, select=columns), unkX = unkX,
-                                  unkOnly = !is.null(unkX) & !is.null(subset(test, select=columns)))
+    testX = subset(testDataset, select=columns)
+    unkX <- testX
+    colnames(unkX) <- make.names(colnames(testX))
+    colnames(testX) <- make.names(colnames(testX))
+    predicts <- extractPrediction(list(my_svm=svm_model), testX = testX, unkX = unkX,
+                                  unkOnly = !is.null(unkX) & !is.null(testX))
     
     predicts <- predicts$pred
     
