@@ -57,16 +57,26 @@ rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected,bestParameter
   test <- test[,vars_selected]
 
   train = vapply(train, function(x){ 
-    max = max(x)
-    min = min(x)
-    x = ((x-min)/(max-min))*2-1}, double(nrow(train)))
+    max <- max(x)
+    min <- min(x)
+    if(max >  min){
+      x <- ((x - min) / (max - min)) * 2 - 1
+    }
+    else{
+      x
+    }}, double(nrow(train)))
   
   train <- as.data.frame(train)
   
   test = vapply(test, function(x){ 
-    max = max(x)
-    min = min(x)
-    x = ((x-min)/(max-min))*2-1}, double(nrow(test)))
+    max <- max(x)
+    min <- min(x)
+    if(max >  min){
+      x <- ((x - min) / (max - min)) * 2 - 1
+    }
+    else{
+      x
+    }}, double(nrow(test)))
   
   test <- as.data.frame(test)
   
@@ -84,7 +94,7 @@ rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected,bestParameter
   columns <- c(colNames[1])
   tr_ctr <- trainControl(method="none")
   dataForTrt <- data.frame(cbind(subset(train, select=columns),labelsTrain))
-  colnames(dataForTrt)[seq(1)] <- columns
+  colnames(dataForTrt)[seq(1)] <- make.names(columns)
   rf_mod <- train(labelsTrain ~ ., 
                   data = dataForTrt,
                   method = 'rf',
@@ -93,9 +103,12 @@ rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected,bestParameter
                   ntree=1000,
                   tuneGrid = data.frame(.mtry= bestParameters))
   
-  unkX <- subset(test, select=columns)
-  predicts <- extractPrediction(list(my_rf=rf_mod), testX = subset(test, select=columns), unkX = unkX,
-                                unkOnly = !is.null(unkX) & !is.null(subset(test, select=columns)))
+  testX = subset(testDataset, select=columns)
+  unkX <- testX
+  colnames(unkX) <- make.names(colnames(testX))
+  colnames(testX) <- make.names(colnames(testX))
+  predicts <- extractPrediction(list(my_rf=rf_mod), testX = testX, unkX = unkX,
+                                unkOnly = !is.null(unkX) & !is.null(testX))
   
   predicts <- predicts$pred
   
@@ -122,7 +135,7 @@ rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected,bestParameter
     columns <- c(colNames[seq(i)])
     tr_ctr <- trainControl(method="none")
     dataForTrt <- data.frame(cbind(subset(train, select=columns),labelsTrain))
-    colnames(dataForTrt)[seq(i)] <- columns
+    colnames(dataForTrt)[seq(i)] <- make.names(columns)
     rf_mod <- train(labelsTrain ~ ., 
                     data = dataForTrt,
                     method = 'rf',
@@ -131,9 +144,12 @@ rf_test <-function(train,labelsTrain,test,labelsTest,vars_selected,bestParameter
                     ntree=1000,
                     tuneGrid = data.frame(.mtry= bestParameters))
     
-    unkX <- subset(test, select=columns)
-    predicts <- extractPrediction(list(my_rf=rf_mod), testX = subset(test, select=columns), unkX = unkX,
-                                  unkOnly = !is.null(unkX) & !is.null(subset(test, select=columns)))
+    testX = subset(testDataset, select=columns)
+    unkX <- testX
+    colnames(unkX) <- make.names(colnames(testX))
+    colnames(testX) <- make.names(colnames(testX))
+    predicts <- extractPrediction(list(my_rf=rf_mod), testX = testX, unkX = unkX,
+                                  unkOnly = !is.null(unkX) & !is.null(testX))
     
     predicts <- predicts$pred
 
