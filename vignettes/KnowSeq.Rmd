@@ -5,9 +5,6 @@ author: Daniel Castillo-Secilla, Juan Manuel Galvez, Marta Verona-Almeida, Franc
   <br> Carrillo-Perez, Francisco Manuel Ortuno, Luis Javier Herrera and Ignacio Rojas
 date: "march, 29 of 2020"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
   html_document:
     number_sections: yes
     toc: yes
@@ -15,6 +12,9 @@ output:
     toc_float: yes
     highlight: tango
     css: vignette_style.css
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
 subtitle: 'KnowSeq: R/Bioconductor package'
 header-includes:
 - \pdfminorversion=5
@@ -22,8 +22,10 @@ header-includes:
 - \pdfobjcompresslevel=2
 BiocStyle::html_vignette:
   md_extensions: -autolink_bare_uris
-vignette: |
-  %\VignetteIndexEntry{The KnowSeq users guide}  \usepackage[UTF-8]{inputenc}  %\VignetteEngine{knitr::rmarkdown}
+vignette: >
+  %\VignetteIndexEntry{The KnowSeq users guide}
+  %\VignetteEncoding{UTF-8}  
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r setup, cache = F, echo = FALSE}
