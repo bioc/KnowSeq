@@ -2,14 +2,13 @@
 #'
 #' The function obtains the information about what diseases are related to the DEGs indicated by parameter. For that, the function makes use of the web platforms gene2Diseases and targetValidation.
 #' @param geneList A list that contains the gene symbols or gene names of the DEGs.
-#' @param minCitation Minimum number of citations of each genes in a disease to consider the genes related with the disease.
 #' @param size The number of diseases to retrieve from targetValidation
 #' @param getEvidences Boolean. If true, for each gene, a list of found evidences for each disease will be returned.
 #' @return A list which contains the information about the diseases associated to each genes or to a set of genes. If getEvidences is TRUE, found evidences for each case will be returned too.
 #' @examples
 #' diseases <- DEGsToDiseases(c("KRT19","BRCA1"),getEvidences = FALSE)
-
-DEGsToDiseases <- function(geneList, minCitation = 5, size = 10, getEvidences = FALSE){
+ 
+DEGsToDiseases <- function(geneList, size = 10, getEvidences = FALSE){
 
   if(length(geneList)[1] == 0 || is.null(geneList)){
 
@@ -28,7 +27,7 @@ DEGsToDiseases <- function(geneList, minCitation = 5, size = 10, getEvidences = 
         id
         approvedSymbol
         approvedName
-        bioType
+        biotype
         associatedDiseases{
           count
           rows{
