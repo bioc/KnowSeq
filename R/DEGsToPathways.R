@@ -61,8 +61,9 @@ DEGsToPathways <- function(geneList){
       
     }
   }
-  KEGG.data <- KEGG.data[-1,]
+  
   KEGG.data <- as.data.frame(KEGG.data,stringsAsFactors=FALSE)
+  KEGG.data <- KEGG.data[-1,]
   names(KEGG.data) <- c("KEGG_Path","Name","Description","Class","Genes")
   naPos <- which(is.na(KEGG.data) == TRUE)
   
@@ -82,16 +83,17 @@ DEGsToPathways <- function(geneList){
   rownames(KEGG.data) <- NULL
   
   
+  # For future implementation of Reactome
   #cat("Retrieving information about Reactome pathways...\n")
   
-  response <- GET("https://reactome.org/content/query?q=BRCA1&species=Homo+sapiens&species=Entries+without+species&cluster=true")
-  response_text <- content(response, "text")
-  proteinMatches <- str_locate_all(pattern = "Protein", response_text)
-  proteinEnd <- unlist(proteinMatches)[length(unlist(proteinMatches))]
-  geneMatches <- str_locate_all(pattern = "BRCA1", response_text)
-  geneMatches <- unlist(geneMatches)
-  geneInfo <- substr(response_text,proteinEnd, geneMatches[which(geneMatches > proteinEnd)[1]])
-  geneInfo <- regmatches(geneInfo,gregexpr("(R-HSA-\\d{1,})", geneInfo, perl=TRUE))
+  #response <- GET("https://reactome.org/content/query?q=BRCA1&species=Homo+sapiens&species=Entries+without+species&cluster=true")
+  #response_text <- content(response, "text")
+  #proteinMatches <- str_locate_all(pattern = "Protein", response_text)
+  #proteinEnd <- unlist(proteinMatches)[length(unlist(proteinMatches))]
+  #geneMatches <- str_locate_all(pattern = "BRCA1", response_text)
+  #geneMatches <- unlist(geneMatches)
+  #geneInfo <- substr(response_text,proteinEnd, geneMatches[which(geneMatches > proteinEnd)[1]])
+  #geneInfo <- regmatches(geneInfo,gregexpr("(R-HSA-\\d{1,})", geneInfo, perl=TRUE))
   
   invisible(KEGG.data)
 
