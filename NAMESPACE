@@ -1,6 +1,7 @@
 import(stringr, XML, kernlab, e1071)
 
 importFrom(sva, sva, f.pvalue, num.sv, ComBat)
+importFrom(class, knn.cv)
 importFrom(jsonlite, fromJSON)
 importFrom(R.utils, mkdirs, gunzip)
 importFrom(randomForest, randomForest)
